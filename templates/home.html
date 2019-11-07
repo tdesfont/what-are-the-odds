@@ -1,7 +1,5 @@
 <!doctype html>
 <html>
-
-
   <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
     <style>
@@ -27,7 +25,7 @@
     </div>
 	<h2> Computation of the odds:</h2>
 	<p> To compute the odds for a given empire.json, you should send the json via curl or postman (see the README.md), then refresh the page between each new request. By default, when no json has been received yet, the probability displayed will be 0%.</p>
-	<p> The Millenium Falcon has a probability of {{percentage}} % to save the galaxy. </p>
+	<p style="font-size:160%; color=red;"> The Millenium Falcon has a probability of <result>{{percentage}} %</result> to save the galaxy. </p>
     <script>
       var roleScale = d3.scaleOrdinal()
         
