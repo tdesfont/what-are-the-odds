@@ -18,7 +18,6 @@ def get_db(db_path):
     db.row_factory = sqlite3.Row
     return db
 
-
 def query_db(db_path, query, args=(), one=False):
     cur = get_db(db_path).execute(query, args)
     rv = cur.fetchall()
@@ -27,9 +26,11 @@ def query_db(db_path, query, args=(), one=False):
 
 
 def graphFromDB(db_path):
-    graph = defaultdict(list)
+    graph = {}
     for row in query_db(db_path, "SELECT * FROM routes"):
-        graph[row['origin'].lower()].append((row['destination'].lower(), int(row['travel_time'])))
+        if row['origin'] not in graph:
+            graph[row['origin']] = {}
+        graph[row['origin']][row['destination']] = int(row['travel_time'])
     return graph
 
 
@@ -46,14 +47,17 @@ def index():
     milleniumFalcon = json.load(open("millenium-falcon.json"))
     db_path = milleniumFalcon['routes_db']
     graph = graphFromDB("universe.db")
-    # Load json
-    req = request.get_json(silent=True)
-    if req:
-        countdown = req['countdown']
-        bounty_hunters = req['bounty_hunters']
-        proba = solver.odds(milleniumFalcon, graph, countdown, bounty_hunters)
+    print("\n Millenium Falcon: \n", milleniumFalcon)
+    print("\n Graph: \n", graph)
+
+    # Load empire intelligence json
+    empire = request.get_json(silent=True)
+    if empire:
+        print("\n Empire Json: \n", empire)
+        proba = solver.odds(milleniumFalcon, graph, empire)
         print("Survival proba:", proba)
-    return "Send a json using POST request to this page. The proba of survival is {}".format(proba)
+        return "The proba of survival is {}".format(proba)
+    return "Send a json using POST request to this page. Proba: {}".format(proba)
 
 if __name__ == "__main__":
     app.run(debug=True)
