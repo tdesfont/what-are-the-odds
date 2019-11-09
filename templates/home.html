@@ -1,99 +1,26 @@
 <!doctype html>
 <html>
   <head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript"></script>
-    <style>
-    .node {
-      fill: #FFFFFF;
-    }
-    .link {
-      stroke: #FF0000;
-    }
-
-	.result {
-        color: #FF0000;
-		font-size: 30px;
-		font-weight: bold;
-      }
-    </style>
   </head>
   <body>
 	<h1> Welcome to the "Compute the odds Web Application".</h1>
-	<h2> The galaxy:</h2>
-    <div id="viz" style="background-image: url('/static/image/galaxy.jpg'); background-repeat: no-repeat; background-size: 900px;">
-      <svg style="width:300px;height:300px;" ></svg>
-    </div>
 	<h2> Computation of the odds:</h2>
-	<p> To compute the odds for a given empire.json, you should send the json via curl or postman (see the README.md), then refresh the page between each new request. By default, when no json has been received yet, the probability displayed will be 0%.</p>
-	<p style="font-size:160%; color=red;"> The Millenium Falcon has a probability of <result>{{percentage}} %</result> to save the galaxy. </p>
-    <script>
-      var roleScale = d3.scaleOrdinal()
-        
-      var PromiseWrapper = d => new Promise(resolve => d3.csv(d, p => resolve(p)));
-      
-      Promise
-        .all([
-          PromiseWrapper("/static/data/nodes.csv"),
-          PromiseWrapper("/static/data/edges.csv")
-        ])
-        .then(resolve => {
-          createForceLayout(resolve[0], resolve[1]);
-        });
-      
-      function createForceLayout(nodes,edges) {
-        var nodeHash = {};
-        nodes.forEach(node => {
-          nodeHash[node.id] = node;
-        });
-        
-        edges.forEach(edge => {
-          edge.weight = parseInt(edge.weight);
-          edge.source = nodeHash[edge.source];
-          edge.target = nodeHash[edge.target];
-        });
-        
-        var linkForce = d3.forceLink();
-        
-        var simulation = d3.forceSimulation()
-          .force("charge", d3.forceManyBody().strength(-900))
-          .force("center", d3.forceCenter().x(150).y(150))
-          .force("link", linkForce)
-          .nodes(nodes)
-          .on("tick", forceTick);
-        
-        simulation.force("link").links(edges);
-        
-        d3.select("svg").selectAll("line.link")
-          .data(edges, d => `${d.source.id}-${d.target.id}`)
-          .enter()
-          .append("line")
-            .attr("class", "link")
-            .style("opacity", .5)
-            .style("stroke-width", d => d.weight);
-        
-        var nodeEnter = d3.select("svg").selectAll("g.node")
-          .data(nodes, d => d.id)
-          .enter()
-          .append("g")
-            .attr("class", "node");
-        nodeEnter.append("circle")
-          .attr("r", 6)
-          .style("fill", d => roleScale(d.role));
-        nodeEnter.append("text")
-          .style("text-anchor", "middle")
-          .attr("y", 20)
-          .text(d => d.id);
-        
-        function forceTick() {
-          d3.selectAll("line.link")
-            .attr("x1", d => d.source.x)
-            .attr("x2", d => d.target.x)
-            .attr("y1", d => d.source.y)
-            .attr("y2", d => d.target.y);
-          d3.selectAll("g.node")
-            .attr("transform", d => `translate(${d.x},${d.y})`);
-        }
-      }
-    </script>
+	<p> To compute the odds for a given empire.json, you should send the json via curl or postman (see the README.md), then refresh the page between each new request.</p>
+	<p style="font-size:160%; color:red;"> 
+		{% if n_explored_path %}
+		The Millenium Falcon has probability of {{percentage}} % to save the galaxy.		
+		{% endif %}		
+	</p>
+	<p> 
+		{% if path %}
+		{{ path }}
+		{% endif %}		
+	</p>
+	<p> 
+		{% if n_explored_path %}
+		Number of scanned path in the galaxy:
+		{{ n_explored_path }}	
+		{% endif %}	
+	</p>
   </body>
 </html>

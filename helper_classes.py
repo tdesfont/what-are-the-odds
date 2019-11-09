@@ -1,3 +1,27 @@
+class Universe:
+
+    def __init__(self, routes, bounty):
+        self.routes = routes
+        self.bounty = bounty
+
+    def get_destinations(self, source):
+        if source not in self.routes:
+            return []
+        destinations = []
+        for dest in self.routes[source]:
+            destinations.append(dest)
+        return destinations
+
+    def get_travel_time(self, source, target):
+        return self.routes[source][target]
+
+    def get_bounty_presence(self, loc, day):
+        key = (loc, day)
+        if key in self.bounty:
+            return self.bounty[key]
+        else:
+            return 0
+
 class Path:
 
     def __init__(self, autonomy, countdown, start, end, universe):
@@ -42,34 +66,7 @@ class Path:
         return self.path[-1] == self.end
 
     def __str__(self):
-        return "\n Travel description: \n \
-                Path:     {}\n \
-                Bountys:  {}\n \
-                Autonomy: {}\n \
-                Day:      {}\n \
-                Countdow: {}".format(self.path, self.n_days_bounty, self.autonomy, self.day, self.countdown)
+        return "Path: {}, Bountys:{}, Autonomy:{}, Day:{}, Countdow:{}".format(
+            self.path, self.n_days_bounty, self.autonomy, self.day, self.countdown)
 
 
-class Universe:
-
-    def __init__(self, routes, bounty):
-        self.routes = routes
-        self.bounty = bounty
-
-    def get_destinations(self, source):
-        if source not in self.routes:
-            return []
-        destinations = []
-        for dest in self.routes[source]:
-            destinations.append(dest)
-        return destinations
-
-    def get_travel_time(self, source, target):
-        return self.routes[source][target]
-
-    def get_bounty_presence(self, loc, day):
-        key = (loc, day)
-        if key in self.bounty:
-            return self.bounty[key]
-        else:
-            return 0
